@@ -2,7 +2,9 @@ import pandas as pd
 from openbb import obb
 from statsmodels.api import OLS, add_constant
 from statsmodels.tsa.stattools import adfuller
+import statsmodels.api as stat
 from src.config import get_api_key
+
 
 class DataWrangler:
     """
@@ -92,3 +94,19 @@ class TimeSeriesAnalysis:
         adfstat, pvalue, usedlag, nobs, crit_values = adfuller(z, maxlag=1, autolag=None)
 
         return adfstat, pvalue
+    
+    def adf_test(data):
+        #store result of OLS regression on closing prices of fetched data
+        data = data.dropna()
+        result = stat.OLS(data[0], data[1]).fit()
+        #run the adfuller test by passing residuals of the regression as the input, store the result in computation
+        computationResults = adfuller(result.resid)
+
+        print(f"{data[0].name} vs {data[1].name}")
+        print ("Significance Level:", computationResults[0] )
+        print ("pValue is:", computationResults[1] )
+        print ("Critical Value Parameters", computationResults[4] )
+
+        if computationResults[0] <= computationResults[4]['10%']  and computationResults[1]<= 0.05:
+            print("Given Sig Level <= Critical Value @ 10%, and pValue <= 0.05")
+            print ("Co-integrated")
