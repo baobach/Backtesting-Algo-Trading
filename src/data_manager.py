@@ -47,26 +47,31 @@ class DataManager:
         df = df.set_index('date')  # Set the index as the date column
         return df
     
-    def cerebro_add_data(self, ticker1, ticker2, cerebro):
+    def cerebro_add_data(self, tickers, cerebro):
         """
-        Loads and adds the data for two tickers to the cerebro engine.
+        Loads and adds the data for multiple tickers to the cerebro engine.
 
         It checks if the ticker data files exist in the data_folder.
         If any of the files do not exist, it raises a ValueError.
         Otherwise, it reads the CSV files using pandas and adds the data to the cerebro engine.
 
         Parameters:
-        - ticker1 (str): The ticker symbol for the first data to load and add.
-        - ticker2 (str): The ticker symbol for the second data to load and add.
+        - tickers (list): A list of ticker symbols to load and add.
         - cerebro (backtrader.Cerebro): The cerebro engine to add the data to.
         """
-        file_path1 = os.path.join(self.data_folder, f'{ticker1}.csv')
-        file_path2 = os.path.join(self.data_folder, f'{ticker2}.csv')
-        if not os.path.exists(file_path1):
-            raise ValueError(f'Ticker data for {ticker1} does not exist.')
-        if not os.path.exists(file_path2):
-            raise ValueError(f'Ticker data for {ticker2} does not exist.')
-        data1 = bt.feeds.YahooFinanceCSVData(dataname=file_path1)
-        data2 = bt.feeds.YahooFinanceCSVData(dataname=file_path2)
-        cerebro.adddata(data1, name=ticker1)
-        cerebro.adddata(data2, name=ticker2)
+        for ticker in tickers:
+            file_path = os.path.join(self.data_folder, f'{ticker}.csv')
+            if not os.path.exists(file_path):
+                raise ValueError(f'Ticker data for {ticker} does not exist.')
+            data = bt.feeds.GenericCSVData(
+                dataname=file_path,
+                nullvalue=0.0,
+                dtformat=('%Y-%m-%d'),
+                datetime=0,
+                high=1,
+                low=2,
+                open=3,
+                close=4,
+                volume=5
+                )
+            cerebro.adddata(data, name=ticker)

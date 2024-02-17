@@ -10,11 +10,11 @@ from src.utils import DataWrangler
 # Load equities list
 pat = get_api_key()
 obb.account.login(pat=pat)
-tickers = obb.index.constituents("dowjones").to_df()['symbol']
+tickers = obb.index.constituents('nasdaq').to_df()['symbol']
 
 # Create an instance of the datawrangler class
 start_date = '2020-01-01'
-end_date = '2023-01-01'
+end_date = '2024-01-01'
 dw = DataWrangler()
 
 # Download data for each ticker in the list

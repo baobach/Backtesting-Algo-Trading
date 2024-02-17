@@ -15,7 +15,7 @@ class DataWrangler:
         self.pat = get_api_key()
         obb.account.login(pat=self.pat)
         self.start_date = '2020-01-01'
-        self.end_date = '2023-01-01'
+        self.end_date = '2024-01-01'
 
     def download_data(self, ticker, start_date, end_date):
         """
@@ -29,7 +29,7 @@ class DataWrangler:
         Returns:
         - historical_data (pandas.DataFrame): The historical data for the given ticker.
         """
-        historical_data = obb.equity.price.historical(ticker, interval='1d', start_date=start_date, end_date=end_date).to_df()
+        historical_data = obb.equity.price.historical(ticker, interval='1d', start_date=start_date, end_date=end_date, provider='yfinance').to_df()
         return historical_data
 
 class TimeSeriesAnalysis:
@@ -131,11 +131,12 @@ class TimeSeriesAnalysis:
         #run the adfuller test by passing residuals of the regression as the input, store the result in computation
         computationResults = adfuller(result.resid)
 
-        print("Time series 1 vs Time series 2")
-        print ("Significance Level:", computationResults[0] )
-        print ("pValue is:", computationResults[1] )
-        print ("Critical Value Parameters", computationResults[4] )
+        # print("Time series 1 vs Time series 2")
+        # print ("Significance Level:", computationResults[0] )
+        # print ("pValue is:", computationResults[1] )
+        # print ("Critical Value Parameters", computationResults[4] )
 
         if computationResults[0] <= computationResults[4]['10%']  and computationResults[1]<= 0.05:
             print("Given Sig Level <= Critical Value @ 10%, and pValue <= 0.05")
             print ("Co-integrated")
+            return True

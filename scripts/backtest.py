@@ -3,7 +3,7 @@ from __future__ import (absolute_import, division, print_function,
 import sys
 sys.path.append("/Users/baobach/Backtesting-Algo-Trading")
 import backtrader as bt
-from src.strategy import PairsTradingStrategy
+from src.strategy import PairsTradingStrategy, SimpleMovingAverage, TestStrategy
 from src.analyzer import AnalyzerSuite
 from src.data_manager import DataManager
 
@@ -13,13 +13,12 @@ if __name__ == '__main__':
     cerebro = bt.Cerebro()
     data = DataManager()
     # Add a strategy
-    ticker_1 = 'CSCO'
-    ticker_2 = 'MSFT'
+    tickers = ['CSCO', 'MSFT']
     cerebro.addstrategy(PairsTradingStrategy)
-    data.cerebro_add_data(ticker1=ticker_1, ticker2=ticker_2, cerebro=cerebro)
+    data.cerebro_add_data(tickers=tickers, cerebro=cerebro)
 
     # Set our desired cash start
-    cerebro.broker.setcash(100000.0)
+    cerebro.broker.setcash(100_000.0)
     # Set the commission
     #cerebro.broker.setcommission(commission=0.001)
 
@@ -38,4 +37,4 @@ if __name__ == '__main__':
     # Print out the final result
     print('Final Portfolio Value: %.2f' % cerebro.broker.getvalue())
     # Plot the result
-    cerebro.plot()
+    cerebro.plot()  
