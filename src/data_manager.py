@@ -10,7 +10,7 @@ class DataManager:
         - load_ticker_data(ticker): Loads the data for a specific ticker.
         - cerebro_add_data(ticker1, ticker2, cerebro): Loads and adds the data for two tickers to the cerebro engine.
         """
-        self.data_folder = '../data/raw'
+        self.data_folder = '/Users/baobach/Backtesting-Algo-Trading/data/raw'
 
     def get_available_tickers(self):
         """

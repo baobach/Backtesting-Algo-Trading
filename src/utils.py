@@ -33,33 +33,39 @@ class DataWrangler:
         return historical_data
 
 class TimeSeriesAnalysis:
+    """
+    A class for performing time series analysis.
+    - estimate_long_run_short_run_relationships(y, x) to estimate the long-run and short-run cointegration relationships.
+    - engle_granger_two_step_cointegration_test(y, x) to perform the two-step Engle & Granger test for cointegration.
+    - adf_test(data) to perform the Augmented Dickey-Fuller test for cointegration.
+    """
     
     @staticmethod
-    def estimate_long_run_short_run_relationships(y, x):
+    def estimate_long_run_short_run_relationships(df1, df2):
         """
-        Estimates the long-run and short-run cointegration relationship between two series, y and x.
+        Estimates the long-run and short-run cointegration relationship between two series, df1 and df2.
         
         Parameters:
-            y (pd.Series): The first input series.
-            x (pd.Series): The second input series.
+            df1 (pd.Series): The first input series.
+            df2 (pd.Series): The second input series.
         
         Returns:
             tuple: A tuple containing the estimated coefficients for the long-run relationship (c and gamma),
                    the estimated coefficient for the short-run relationship (alpha), and the residuals (z).
         """
-        assert isinstance(y, pd.Series), 'Input series y should be of type pd.Series'
-        assert isinstance(x, pd.Series), 'Input series x should be of type pd.Series'
-        assert sum(y.isnull()) == 0, 'Input series y has nan-values. Unhandled case.'
-        assert sum(x.isnull()) == 0, 'Input series x has nan-values. Unhandled case.'
-        assert y.index.equals(x.index), 'The two input series y and x do not have the same index.'
+        assert isinstance(df1, pd.Series), 'Input series df1 should be of type pd.Series'
+        assert isinstance(df2, pd.Series), 'Input series df2 should be of type pd.Series'
+        assert sum(df1.isnull()) == 0, 'Input series df1 has nan-values. Unhandled case.'
+        assert sum(df2.isnull()) == 0, 'Input series df2 has nan-values. Unhandled case.'
+        assert df1.index.equals(df2.index), 'The two input series df1 and df2 do not have the same index.'
         
-        long_run_ols = OLS(y, add_constant(x), has_const=True)
+        long_run_ols = OLS(df1, add_constant(df2), has_const=True)
         long_run_ols_fit = long_run_ols.fit()
 
         c, gamma = long_run_ols_fit.params
         z = long_run_ols_fit.resid
 
-        short_run_ols = OLS(y.diff().iloc[1:], (z.shift().iloc[1:]))
+        short_run_ols = OLS(df1.diff().iloc[1:], (z.shift().iloc[1:]))
         short_run_ols_fit = short_run_ols.fit()
 
         alpha = short_run_ols_fit.params[0]
@@ -67,42 +73,65 @@ class TimeSeriesAnalysis:
         return c, gamma, alpha, z
 
     @staticmethod
-    def engle_granger_two_step_cointegration_test(y, x):
+    def engle_granger_two_step_cointegration_test(df1, df2):
         """
         Applies the two-step Engle & Granger test for cointegration.
         
-        This function performs the two-step Engle & Granger test for cointegration between two time series, y and x.
+        This function performs the two-step Engle & Granger test for cointegration between two time series, df1 and df2.
         Cointegration is a statistical property that indicates a long-term relationship between two time series, 
         even if they are not directly correlated in the short term. The Engle & Granger test is a common method 
         used to test for cointegration.
         
         Parameters:
-            y (pd.Series): The first input time series.
-            x (pd.Series): The second input time series.
+            df1 (pd.Series): The first input time series.
+            df2 (pd.Series): The second input time series.
             
         Returns:
             Tuple: A tuple containing the Augmented Dickey-Fuller test statistic (adfstat) and the p-value (pvalue).
         """
-        assert isinstance(y, pd.Series), 'Input series y should be of type pd.Series'
-        assert isinstance(x, pd.Series), 'Input series x should be of type pd.Series'
-        assert sum(y.isnull()) == 0, 'Input series y has nan-values. Unhandled case.'
-        assert sum(x.isnull()) == 0, 'Input series x has nan-values. Unhandled case.'
-        assert y.index.equals(x.index), 'The two input series y and x do not have the same index.'
+        assert isinstance(df1, pd.Series), 'Input series df1 should be of type pd.Series'
+        assert isinstance(df2, pd.Series), 'Input series df2 should be of type pd.Series'
+        assert sum(df1.isnull()) == 0, 'Input series df1 has nan-values. Unhandled case.'
+        assert sum(df2.isnull()) == 0, 'Input series df2 has nan-values. Unhandled case.'
+        assert df1.index.equals(df2.index), 'The two input series df1 and df2 do not have the same index.'
 
-        c, gamma, alpha, z = TimeSeriesAnalysis.estimate_long_run_short_run_relationships(y, x)
+        c, gamma, alpha, z = TimeSeriesAnalysis.estimate_long_run_short_run_relationships(df1, df2)
 
         adfstat, pvalue, usedlag, nobs, crit_values = adfuller(z, maxlag=1, autolag=None)
 
         return adfstat, pvalue
     
-    def adf_test(data):
+    @staticmethod
+    def adf_test(df1, df2):
+        """
+        Applies the Augmented Dickey-Fuller test for cointegration.
+
+        This function performs the Augmented Dickey-Fuller test for cointegration between two time series, df1 and df2.
+        Cointegration is a statistical property that indicates a long-term relationship between two time series,
+        even if they are not directly correlated in the short term. The Augmented Dickey-Fuller test is a common method
+        used to test for cointegration.
+
+        Parameters:
+            df1 (pd.Series): The first input time series.
+            df2 (pd.Series): The second input time series.
+
+        Returns:
+            Tuple: A tuple containing the Augmented Dickey-Fuller test statistic (adfstat) and the p-value (pvalue).
+        """
+        assert isinstance(df1, pd.Series), 'Input series df1 should be of type pd.Series'
+        assert isinstance(df2, pd.Series), 'Input series df2 should be of type pd.Series'
+        assert sum(df1.isnull()) == 0, 'Input series df1 has nan-values. Unhandled case.'
+        assert sum(df2.isnull()) == 0, 'Input series df2 has nan-values. Unhandled case.'
+        assert df1.index.equals(df2.index), 'The two input series df1 and df2 do not have the same index.'
+
         #store result of OLS regression on closing prices of fetched data
-        data = data.dropna()
-        result = stat.OLS(data[0], data[1]).fit()
+        df1 = df1.dropna()
+        df2 = df2.dropna()
+        result = stat.OLS(df1, df2).fit()
         #run the adfuller test by passing residuals of the regression as the input, store the result in computation
         computationResults = adfuller(result.resid)
 
-        print(f"{data[0].name} vs {data[1].name}")
+        print("Time series 1 vs Time series 2")
         print ("Significance Level:", computationResults[0] )
         print ("pValue is:", computationResults[1] )
         print ("Critical Value Parameters", computationResults[4] )
