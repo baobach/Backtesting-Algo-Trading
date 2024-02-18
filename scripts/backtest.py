@@ -3,7 +3,7 @@ from __future__ import (absolute_import, division, print_function,
 import sys
 sys.path.append("/Users/baobach/Backtesting-Algo-Trading")
 import backtrader as bt
-from src.strategy import PairsTradingStrategy, SimpleMovingAverage, TestStrategy
+from src.strategy import PairsTradingStrategy, SimpleMovingAverage, SimpleRSI
 from src.analyzer import AnalyzerSuite
 from src.data_manager import DataManager
 
@@ -13,8 +13,8 @@ if __name__ == '__main__':
     cerebro = bt.Cerebro()
     data = DataManager()
     # Add a strategy
-    tickers = ['CSCO', 'MSFT']
-    cerebro.addstrategy(PairsTradingStrategy)
+    tickers = ['AAPL']
+    cerebro.addstrategy(SimpleRSI)
     data.cerebro_add_data(tickers=tickers, cerebro=cerebro)
 
     # Set our desired cash start

@@ -207,7 +207,7 @@ class SimpleMovingAverage(bt.Strategy):
         elif self.buysig > 0:
             self.buy()
 
-class TestStrategy(bt.Strategy):
+class SimpleRSI(bt.Strategy):
     params = (
         ('maperiod', 15),
         ('printlog', False),
@@ -228,9 +228,8 @@ class TestStrategy(bt.Strategy):
         self.buyprice = None
         self.buycomm = None
 
-        # Add a MovingAverageSimple indicator
-        self.sma = bt.indicators.SimpleMovingAverage(
-            self.datas[0], period=self.params.maperiod)
+        # Add a RSI indicator
+        self.rsi = bt.indicators.RelativeStrengthIndex(self.datas[0])
 
     def notify_order(self, order):
         if order.status in [order.Submitted, order.Accepted]:
@@ -282,7 +281,7 @@ class TestStrategy(bt.Strategy):
         if not self.position:
 
             # Not yet ... we MIGHT BUY if ...
-            if self.dataclose[0] > self.sma[0]:
+            if self.rsi[0] < 40:
 
                 # BUY, BUY, BUY!!! (with all possible default parameters)
                 self.log('BUY CREATE, %.2f' % self.dataclose[0])
@@ -292,7 +291,7 @@ class TestStrategy(bt.Strategy):
 
         else:
 
-            if self.dataclose[0] < self.sma[0]:
+            if self.rsi[0] > 60:
                 # SELL, SELL, SELL!!! (with all possible default parameters)
                 self.log('SELL CREATE, %.2f' % self.dataclose[0])
 
